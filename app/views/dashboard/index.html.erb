@@ -1,0 +1,12 @@
+<% content_for :title, "Visualize Git — dashboard" %>
+
+<div class="flex items-end justify-between gap-4 flex-wrap">
+  <div>
+    <p class="text-xs text-neutral-500 uppercase tracking-widest mb-1">monitored repositories</p>
+    <h1 class="text-4xl font-bold text-neutral-50"><span id="repo-count"><%= @repositories.size %></span> <span class="text-neutral-500 text-2xl">repos</span></h1>
+  </div>
+
+  <%= render "dashboard/add_form" %>
+</div>
+
+<%= render "dashboard/content", repositories: @repositories, overview: @overview, sort: @sort %>

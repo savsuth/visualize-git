@@ -1,0 +1,29 @@
+# Server compose installed by bin/deploy (see its header for configuration).
+# Secrets and per-server settings live in .env next to this file on the
+# server; bin/deploy seeds it on first deploy and never overwrites it.
+
+name: visualize_git
+
+services:
+  visualize-git:
+    image: ${GV_IMAGE:-savsuth/visualize-git:latest}
+    container_name: visualize-git
+    restart: always
+    # The image's non-root user; ./storage is chown'd to match by bin/deploy
+    user: "1000:1000"
+    # SELinux hosts (MicroOS/Fedora): never use :Z on bind mounts (breaks SQLite)
+    security_opt:
+      - label:disable
+    ports:
+      - "${PORT:-7592}:80"
+    volumes:
+      - ./storage:/rails/storage
+    env_file: .env
+    environment:
+      - SOLID_QUEUE_IN_PUMA=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

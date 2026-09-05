@@ -1,0 +1,52 @@
+# visualize-git — Docker Compose
+#
+# Quick start:
+#   echo "SECRET_KEY_BASE=$(openssl rand -hex 64)" >> .env
+#   echo "GITHUB_TOKEN=ghp_..." >> .env            # never commit .env
+#   docker compose up -d
+#
+# Homelab notes (openSUSE MicroOS, /var/opt/docker/visualize-git/):
+#   - Bind mounts must NOT use :Z (breaks SQLite via SELinux relabeling);
+#     security_opt label:disable below handles SELinux instead.
+#   - The container runs as uid 1000 (rails); chown -R 1000:1000 ./storage
+#     before first start if the directory already exists.
+
+services:
+  visualize-git:
+    image: visualize-git:latest
+    # Built from this checkout (there is no published image yet):
+    build: .
+    container_name: visualize-git
+    restart: unless-stopped
+    user: "${UID:-1000}:${GID:-1000}"
+    security_opt:
+      - label:disable
+    ports:
+      - "${PORT:-7592}:80"
+    volumes:
+      # SQLite databases (app, cache, queue) live here
+      - ${STORAGE_PATH:-./storage}:/rails/storage
+    environment:
+      # Required — keep both only in .env or the host environment
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE:?generate with openssl rand -hex 64}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:?a GitHub token with repo read access}
+
+      # Run Solid Queue (background sync jobs) inside Puma — single container
+      - SOLID_QUEUE_IN_PUMA=1
+
+      # Optional: timezone used to bucket the charts by day/hour
+      - APP_TIME_ZONE=${APP_TIME_ZONE:-America/Sao_Paulo}
+
+      # Optional: bare repo names in the add form are scoped to this owner
+      - GITHUB_OWNER=${GITHUB_OWNER:-}
+
+      # Optional hardening (recommended beyond a trusted LAN)
+      - HTTP_BASIC_USER=${HTTP_BASIC_USER:-}
+      - HTTP_BASIC_PASSWORD=${HTTP_BASIC_PASSWORD:-}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
