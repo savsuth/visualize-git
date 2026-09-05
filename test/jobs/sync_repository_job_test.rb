@@ -15,7 +15,7 @@ class SyncRepositoryJobTest < ActiveSupport::TestCase
       .to_return(status: 200, headers: github_headers,
                  body: graphql_history_body(commits: [ graphql_commit(sha: "abc123") ],
                                             description: "Fresh description"))
-    stub_request(:get, %r{/repos/akitaonrails/frank_go/actions/runs})
+    stub_request(:get, %r{/repos/savsuth/frank_go/actions/runs})
       .to_return(status: 200, headers: github_headers,
                  body: { workflow_runs: [ rest_workflow_run(id: 42) ] }.to_json)
 

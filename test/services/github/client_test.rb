@@ -17,7 +17,7 @@ module Github
         .to_return(status: 200, headers: github_headers,
                    body: graphql_history_body(commits: [ graphql_commit(sha: "abc123") ]))
 
-      overview = @client.repository_overview("akitaonrails", "ai-memory")
+      overview = @client.repository_overview("savsuth", "ai-memory")
 
       assert_equal "Test repo", overview[:description]
       assert_equal "main", overview[:default_branch]
@@ -26,7 +26,7 @@ module Github
       commit = overview[:commits].first
       assert_equal "abc123", commit[:sha]
       assert_equal "a commit", commit[:message]
-      assert_equal "akitaonrails", commit[:author_login]
+      assert_equal "savsuth", commit[:author_login]
       assert_equal 10, commit[:additions]
       assert_equal Time.utc(2026, 7, 1, 12), commit[:committed_at]
     end
@@ -41,7 +41,7 @@ module Github
                    { status: 200, headers: github_headers, body: page_two })
 
       batches = []
-      overview = @client.repository_overview("akitaonrails", "ai-memory") do |batch|
+      overview = @client.repository_overview("savsuth", "ai-memory") do |batch|
         batches << batch.map { |commit| commit[:sha] }
       end
 
@@ -56,7 +56,7 @@ module Github
                            errors: [ { type: "NOT_FOUND", message: "Could not resolve" } ] }.to_json)
 
       assert_raises(Client::NotFoundError) do
-        @client.repository_overview("akitaonrails", "nope")
+        @client.repository_overview("savsuth", "nope")
       end
     end
 
@@ -64,11 +64,11 @@ module Github
       first_page = { workflow_runs: Array.new(100) { |i| rest_workflow_run(id: i + 1) } }
       second_page = { workflow_runs: [ rest_workflow_run(id: 500, conclusion: "failure") ] }
 
-      stub_request(:get, %r{https://api\.github\.com/repos/akitaonrails/ai-memory/actions/runs})
+      stub_request(:get, %r{https://api\.github\.com/repos/savsuth/ai-memory/actions/runs})
         .to_return({ status: 200, headers: github_headers, body: first_page.to_json },
                    { status: 200, headers: github_headers, body: second_page.to_json })
 
-      runs = @client.workflow_runs("akitaonrails", "ai-memory")
+      runs = @client.workflow_runs("savsuth", "ai-memory")
 
       assert_equal 101, runs.size
       assert_equal "failure", runs.last[:conclusion]
@@ -80,14 +80,14 @@ module Github
       stub_request(:get, %r{https://api\.github\.com/user/repos})
         .with(query: hash_including("affiliation" => "owner"))
         .to_return(status: 200, headers: github_headers, body: [
-          { full_name: "akitaonrails/ai-memory", description: "memory", private: false },
-          { full_name: "akitaonrails/secret", description: nil, private: true }
+          { full_name: "savsuth/ai-memory", description: "memory", private: false },
+          { full_name: "savsuth/secret", description: nil, private: true }
         ].to_json)
 
       repos = @client.user_repositories
 
       assert_equal 2, repos.size
-      assert_equal "akitaonrails/ai-memory", repos.first[:full_name]
+      assert_equal "savsuth/ai-memory", repos.first[:full_name]
       assert repos.last[:private]
     end
 
@@ -95,14 +95,14 @@ module Github
       stub_request(:get, %r{https://api\.github\.com/repos/.+/actions/runs})
         .to_return(status: 500, body: "oops")
 
-      assert_raises(Client::Error) { @client.workflow_runs("akitaonrails", "ai-memory") }
+      assert_raises(Client::Error) { @client.workflow_runs("savsuth", "ai-memory") }
     end
 
     test "raises NotFoundError on 404" do
       stub_request(:get, %r{https://api\.github\.com/repos/.+/actions/runs})
         .to_return(status: 404, body: "{}")
 
-      assert_raises(Client::NotFoundError) { @client.workflow_runs("akitaonrails", "gone") }
+      assert_raises(Client::NotFoundError) { @client.workflow_runs("savsuth", "gone") }
     end
   end
 end

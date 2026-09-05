@@ -56,7 +56,7 @@ module ActiveSupport
     end
 
     def graphql_commit(sha:, message: "a commit", committed_at: "2026-07-01T12:00:00Z",
-                       additions: 10, deletions: 2, login: "akitaonrails")
+                       additions: 10, deletions: 2, login: "savsuth")
       {
         oid: sha,
         messageHeadline: message,

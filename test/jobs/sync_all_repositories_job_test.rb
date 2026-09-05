@@ -26,7 +26,7 @@ class SyncAllRepositoriesJobTest < ActiveSupport::TestCase
   end
 
   test "cold tier picks repos idle for more than 30 days" do
-    stale = Repository.create!(owner: "akitaonrails", name: "stale-repo", created_at: 90.days.ago)
+    stale = Repository.create!(owner: "savsuth", name: "stale-repo", created_at: 90.days.ago)
     stale.commits.create!(sha: "e" * 40, committed_at: 60.days.ago)
 
     assert_enqueued_with(job: SyncRepositoryJob, args: [ stale ]) do

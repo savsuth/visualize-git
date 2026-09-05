@@ -5,7 +5,7 @@ class SyncStatusesControllerTest < ActionDispatch::IntegrationTest
     repository = repositories(:ai_memory)
     repository.update!(sync_status: "syncing", sync_progress: "300 commits fetched")
 
-    get repository_sync_status_url(owner: "akitaonrails", name: "ai-memory")
+    get repository_sync_status_url(owner: "savsuth", name: "ai-memory")
 
     assert_response :success
     body = response.parsed_body
@@ -16,7 +16,7 @@ class SyncStatusesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show 404s for unknown repositories" do
-    get repository_sync_status_url(owner: "akitaonrails", name: "nope")
+    get repository_sync_status_url(owner: "savsuth", name: "nope")
     assert_response :not_found
   end
 end

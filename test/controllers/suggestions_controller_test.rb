@@ -13,26 +13,26 @@ class SuggestionsControllerTest < ActionDispatch::IntegrationTest
   test "index filters by query and excludes monitored repos" do
     stub_request(:get, %r{https://api\.github\.com/user/repos})
       .to_return(status: 200, headers: github_headers, body: [
-        { full_name: "akitaonrails/ai-memory", description: "already monitored", private: false },
-        { full_name: "akitaonrails/ai-jail", description: "sandbox", private: false },
-        { full_name: "akitaonrails/secret-stuff", description: nil, private: true },
-        { full_name: "akitaonrails/frank_mega", description: "downloader", private: false }
+        { full_name: "savsuth/ai-memory", description: "already monitored", private: false },
+        { full_name: "savsuth/ai-jail", description: "sandbox", private: false },
+        { full_name: "savsuth/secret-stuff", description: nil, private: true },
+        { full_name: "savsuth/frank_mega", description: "downloader", private: false }
       ].to_json)
 
     get suggestions_url(q: "ai")
 
     assert_response :success
     names = response.parsed_body.map { |repo| repo["full_name"] }
-    assert_includes names, "akitaonrails/ai-jail"
-    assert_not_includes names, "akitaonrails/ai-memory" # already monitored
-    assert_not_includes names, "akitaonrails/frank_mega" # doesn't match query
+    assert_includes names, "savsuth/ai-jail"
+    assert_not_includes names, "savsuth/ai-memory" # already monitored
+    assert_not_includes names, "savsuth/frank_mega" # doesn't match query
   end
 
   test "display_name drops the prefix for the configured owner" do
-    ENV["GITHUB_OWNER"] = "akitaonrails"
+    ENV["GITHUB_OWNER"] = "savsuth"
     stub_request(:get, %r{https://api\.github\.com/user/repos})
       .to_return(status: 200, headers: github_headers, body: [
-        { full_name: "akitaonrails/ai-jail", description: nil, private: false },
+        { full_name: "savsuth/ai-jail", description: nil, private: false },
         { full_name: "someoneelse/ai-tool", description: nil, private: false }
       ].to_json)
 

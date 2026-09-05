@@ -6,8 +6,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: /2\s+repos/
-    assert_select "a", text: "akitaonrails/ai-memory"
-    assert_select "a", text: "akitaonrails/frank_go"
+    assert_select "a", text: "savsuth/ai-memory"
+    assert_select "a", text: "savsuth/frank_go"
   end
 
   test "index defaults to most recently worked on first" do
@@ -15,7 +15,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     body = response.body
     cards = body[body.index("sort")..] # ai-memory has recent commits, frank_go none
-    assert_operator cards.index("akitaonrails/ai-memory"), :<, cards.index("akitaonrails/frank_go")
+    assert_operator cards.index("savsuth/ai-memory"), :<, cards.index("savsuth/frank_go")
   end
 
   test "index sorts by name descending" do
@@ -23,7 +23,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
     body = response.body
     cards = body[body.index("sort")..]
-    assert_operator cards.index("akitaonrails/frank_go"), :<, cards.index("akitaonrails/ai-memory")
+    assert_operator cards.index("savsuth/frank_go"), :<, cards.index("savsuth/ai-memory")
   end
 
   test "index falls back to default sort on bogus param" do
@@ -32,17 +32,17 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "repos owned by the configured owner render bare names" do
-    ENV["GITHUB_OWNER"] = "akitaonrails"
+    ENV["GITHUB_OWNER"] = "savsuth"
     get root_url
 
     assert_select "a", text: "ai-memory"
-    assert_select "a", text: "akitaonrails/ai-memory", count: 0
+    assert_select "a", text: "savsuth/ai-memory", count: 0
   ensure
     ENV.delete("GITHUB_OWNER")
   end
 
   test "commit bars collapse beyond the top 3" do
-    3.times { |i| Repository.create!(owner: "akitaonrails", name: "extra-#{i}") }
+    3.times { |i| Repository.create!(owner: "savsuth", name: "extra-#{i}") }
     get root_url
 
     assert_match "… show all 5 repos", response.body
@@ -56,16 +56,16 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "header shows the configured owner" do
-    ENV["GITHUB_OWNER"] = "akitaonrails"
+    ENV["GITHUB_OWNER"] = "savsuth"
     get root_url
-    assert_match "(akitaonrails)", response.body
+    assert_match "(savsuth)", response.body
   ensure
     ENV.delete("GITHUB_OWNER")
   end
 
   test "header omits the owner when neither GITHUB_OWNER nor a token is set" do
     get root_url
-    assert_no_match(/\(akitaonrails\)/, response.body)
+    assert_no_match(/\(savsuth\)/, response.body)
   end
 
   test "index renders empty state without repositories" do

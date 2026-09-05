@@ -2,7 +2,7 @@ require "test_helper"
 
 class RepositoryTest < ActiveSupport::TestCase
   test "valid with owner and name" do
-    repository = Repository.new(owner: "akitaonrails", name: "easy-ffmpeg")
+    repository = Repository.new(owner: "savsuth", name: "easy-ffmpeg")
     assert repository.valid?
   end
 
@@ -32,8 +32,8 @@ class RepositoryTest < ActiveSupport::TestCase
 
   test "full_name and github_url" do
     repository = repositories(:ai_memory)
-    assert_equal "akitaonrails/ai-memory", repository.full_name
-    assert_equal "https://github.com/akitaonrails/ai-memory", repository.github_url
+    assert_equal "savsuth/ai-memory", repository.full_name
+    assert_equal "https://github.com/savsuth/ai-memory", repository.github_url
   end
 
   test "sync lifecycle transitions" do

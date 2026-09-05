@@ -19,8 +19,8 @@ class SuggestionsController < ApplicationController
 
   private
 
-  # Matches on the repo name segment — the owner prefix would match every
-  # repo (e.g. "ai" is a substring of "savsuth").
+  # Matches on the repo name segment only — matching the owner prefix would
+  # match every repo owned by that owner.
   def matches?(repo, query)
     return true if query.blank?
 
